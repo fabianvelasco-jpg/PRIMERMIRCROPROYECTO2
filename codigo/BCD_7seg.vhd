@@ -10,7 +10,7 @@ end BCD_7seg;
 
 architecture decodificador of BCD_7seg is
 begin
-    process(entradaBCD)
+    process(entradaBCD)--process sencible a la señal de las entradas de los componentes que están en el sistema top, esto solo se encarga de mandar nuevamente la codicficación 
     begin
         case entradaBCD is
             when "0000" => salida7seg <= "1000000"; 
@@ -23,7 +23,7 @@ begin
             when "0111" => salida7seg <= "1111000"; 
             when "1000" => salida7seg <= "0000000"; 
             when "1001" => salida7seg <= "0010000"; 
-            when others => salida7seg <= "1111111"; 
+            when others => salida7seg <= "1000000"; 
         end case;
     end process;
 end architecture;
