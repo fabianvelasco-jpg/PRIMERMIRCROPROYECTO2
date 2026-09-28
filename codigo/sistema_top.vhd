@@ -1,5 +1,7 @@
 library IEEE;
+library work;
 use IEEE.STD_LOGIC_1164.ALL;
+use work.paquete.ALL;
 
 entity sistema_top is
     port (
@@ -16,32 +18,6 @@ entity sistema_top is
 end entity;
 
 architecture estructural of sistema_top is
-    
-    component divisor_1hz is
-        port (reloj50Mhz, reset1 : in std_logic; reloj1hz : out std_logic);
-    end component;
-
-    component temporizador_base is
-        port (
-            relojBase, resetBase, sensorBase : in std_logic;
-            alarmaBase, premioBase, activaCobro : out std_logic;
-            unidadesBase, decenasBase : out std_logic_vector(3 downto 0)
-        );
-    end component;
-
-    component temporizador_exceso is
-        port (
-            relojExtra, resetExtra, sensorExtra, permisoCobro : in std_logic;
-            unidadesExtra, decenasExtra : out std_logic_vector(3 downto 0)
-        );
-    end component;
-
-    component BCD_7seg is
-        port (
-            entradaBCD : in std_logic_vector(3 downto 0);
-            salida7seg : out std_logic_vector(6 downto 0)
-        );
-    end component;
 
     -- Cables de interconexión interna
     signal cableReloj1hz : std_logic;
@@ -52,14 +28,14 @@ architecture estructural of sistema_top is
     signal cableDec2     : std_logic_vector(3 downto 0);
 
 begin
-    
+    --mapeo para el componente de la señal de 1hz de aquí tengo la señal de 1hz
     U1: divisor_1hz port map (
         reloj50Mhz => relojTop,
         reset1     => resetTop,
         reloj1hz   => cableReloj1hz
     );
 
-    U2: temporizador_base port map (
+    U2: temporizador_base port map ( --temporizador base, este es el que em cuenta de cero a 35 y activa el sigueinte contador (exceso)
         relojBase    => cableReloj1hz,
         resetBase    => resetTop,
         sensorBase   => sensorTop,
@@ -70,7 +46,7 @@ begin
         decenasBase  => cableDec1
     );
 
-    U3: temporizador_exceso port map (
+    U3: temporizador_exceso port map ( --exceso, este es el que cueneta el exceso de la persona,con la activación del anterior cintador
         relojExtra    => cableReloj1hz,
         resetExtra    => resetTop,
         sensorExtra   => sensorTop,
@@ -78,7 +54,7 @@ begin
         unidadesExtra => cableUni2,
         decenasExtra  => cableDec2
     );
-
+    -- llamados al decodificador para los segundos de base y de exceso
     U4: BCD_7seg port map (entradaBCD => cableUni1, salida7seg => dispBaseUni);
     U5: BCD_7seg port map (entradaBCD => cableDec1, salida7seg => dispBaseDec);
     
